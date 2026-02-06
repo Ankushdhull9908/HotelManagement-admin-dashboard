@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sai Ganga Hotel - Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="images/ART_page-0001 copy.jpg">
+</head>
+
+<body>
+
+<div class="login-box">
+  <div class="logo">
+    <img src="images/ART_page-0001 copy.jpg" alt="Sai Ganga Hotel">
+  </div>
+
+  <div class="title">Admin Login</div>
+
+  <input id="username" type="text" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
+
+  <button id="loginBtn" onclick="login()">Login</button>
+
+  <div class="error" id="error"></div>
+</div>
+
+<script>
+
+const API_URL = "http://localhost:3001/api";
+
+async function login() {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const errorBox = document.getElementById("error");
+  const btn = document.getElementById("loginBtn");
+
+  errorBox.textContent = "";
+
+  if (!username || !password) {
+    errorBox.textContent = "Please enter username and password";
+    return;
+  }
+
+  try {
+    btn.textContent = "⏳ Logging in...";
+    btn.disabled = true;
+
+    const res = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      throw new Error("Invalid credentials");
+    }
+
+    // ✅ Save session
+    localStorage.setItem("sessionId", data.sessionId);
+
+    // ✅ Redirect
+    window.location.href = "dashboard.html";
+
+  } catch (err) {
+    errorBox.textContent = "❌ Invalid username or password";
+    btn.textContent = "Login";
+    btn.disabled = false;
+  }
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Enter") login();
+});
+</script>
+
+</body>
+</html>
